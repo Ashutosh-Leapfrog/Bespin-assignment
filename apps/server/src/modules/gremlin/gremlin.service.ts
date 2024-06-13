@@ -33,6 +33,16 @@ export class GremlinService implements OnModuleDestroy {
     return this.translator;
   }
 
+  async assignProperties(
+    traversal: process.GraphTraversal,
+    properties: object,
+  ) {
+    Object.entries(properties).forEach(([key, value]) => {
+      traversal.property(key, value);
+    });
+    return traversal;
+  }
+
   /**
    * Lifecycle method called when the module is being destroyed.
    *
