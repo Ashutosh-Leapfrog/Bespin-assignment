@@ -22,7 +22,7 @@ export default class UserRepo extends BaseRepository {
 
   async getUsers() {
     const traversal = this.gremlinService.getClient().V().hasLabel(USER);
-    return this.execute<User[]>(traversal);
+    return this.execute<User>(traversal);
   }
 
   async getUserById(id: string) {

@@ -1,0 +1,7 @@
+const FRIEND_STATUS = {
+  PENDING: 'PENDING',
+  ACCEPTED: 'ACCEPTED',
+  DECLINED: 'DECLINED',
+};
+
+export default FRIEND_STATUS;

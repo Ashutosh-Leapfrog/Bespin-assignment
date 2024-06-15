@@ -3,18 +3,16 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
   UseGuards,
-  Request,
+  Put,
 } from '@nestjs/common';
 
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import JwtGuard from '../auth/auth.jwt.guard';
-import CustomRequest from '@/interfaces/custom.request';
 
 @Controller('user')
 export class UserController {
@@ -31,23 +29,24 @@ export class UserController {
     }
   }
 
-  // @Get()
-  // findAll() {
-  //   return this.userService.findAll();
-  // }
-
   @UseGuards(JwtGuard)
   @Get()
-  findOne(@Request() req: CustomRequest) {
-    const { userId } = req.user;
-    return this.userService.findOne(userId);
+  findAll() {
+    return this.userService.findAll();
   }
 
-  @Patch(':id')
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.userService.findOne(+id);
+  }
+
+  @UseGuards(JwtGuard)
+  @Put(':id')
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.userService.update(+id, updateUserDto);
   }
 
+  @UseGuards(JwtGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.userService.remove(+id);

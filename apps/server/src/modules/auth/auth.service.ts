@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import argon2 from 'argon2';
@@ -25,8 +25,8 @@ export class AuthService {
     };
 
     return {
-      access_token: this.jwtService.sign(payload),
-      refresh_token: this.jwtService.sign(payload, {
+      accessToken: this.jwtService.sign(payload),
+      refreshToken: this.jwtService.sign(payload, {
         secret: this.configService.get(ENV_CONSTANTS.JWT.REFRESH_SECRET),
         expiresIn: this.configService.get(ENV_CONSTANTS.JWT.REFRESH_EXPIRES_IN),
       }),
@@ -37,13 +37,13 @@ export class AuthService {
     const user = await this.userService.findByEmail(data.username);
 
     if (!user) {
-      throw new Error('User not found');
+      throw new BadRequestException('Email or password is invalid');
     }
 
     const isPasswordValid = await argon2.verify(user.password, data.password);
 
     if (!isPasswordValid) {
-      throw new Error('Invalid password');
+      throw new BadRequestException('Email or password is invalid');
     }
 
     return user;

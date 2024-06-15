@@ -7,6 +7,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { BlogModule } from './modules/blog/blog.module';
 import { GremlinModule } from './modules/gremlin/gremlin.module';
 import { UserModule } from './modules/user/user.module';
+import { UserFriendsModule } from './modules/user-friends/user-friends.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { UserModule } from './modules/user/user.module';
     ConfigModule.forRoot({
       envFilePath: '.env',
     }),
+    UserFriendsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

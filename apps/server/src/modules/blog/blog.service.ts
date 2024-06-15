@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { CreateBlogDto } from './dto/create-blog.dto';
 import { UpdateBlogDto } from './dto/update-blog.dto';
 import BlogRepo from './blog.repo';
@@ -15,7 +19,7 @@ export class BlogService {
   async create(userId: number, createBlogDto: CreateBlogDto) {
     const user = await this.userService.findOne(userId);
     if (!user) {
-      throw new Error('User not found');
+      throw new NotFoundException('User not found');
     }
 
     createBlogDto.authorId = Number(userId);
@@ -31,6 +35,11 @@ export class BlogService {
   }
 
   async findAllByUser(id: number) {
+    const user = await this.userService.findOne(id);
+    if (!user) {
+      throw new NotFoundException('Author does not exist');
+    }
+
     const blogs = await this.blogRepo.getBlogsByAuthorId(id);
     return blogs;
   }
@@ -38,7 +47,7 @@ export class BlogService {
   async findOne(id: number) {
     const [blog] = await this.blogRepo.getBlogById(id);
     if (!blog) {
-      throw new Error('Blog not found');
+      throw new NotFoundException('Blog not found');
     }
 
     return blog;
@@ -48,7 +57,9 @@ export class BlogService {
     const existingBlog = await this.findOne(id);
 
     if (existingBlog.authorId !== userId) {
-      throw new Error('You are not authorized to update this blog');
+      throw new UnauthorizedException(
+        'You are not authorized to update this blog',
+      );
     }
 
     const blog = plainToClass(Blog, updateBlogDto);
@@ -59,7 +70,9 @@ export class BlogService {
   async remove(id: number, userId: number) {
     const existingBlog = await this.findOne(id);
     if (existingBlog.authorId !== userId) {
-      throw new Error('You are not authorized to delete this blog');
+      throw new UnauthorizedException(
+        'You are not authorized to delete this blog',
+      );
     }
 
     return this.blogRepo.deleteBlog(id);

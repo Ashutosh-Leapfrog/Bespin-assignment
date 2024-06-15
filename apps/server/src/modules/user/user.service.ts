@@ -1,11 +1,16 @@
 import argon2 from 'argon2';
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { plainToClass } from 'class-transformer';
 
 import UserRepo from './user.repo';
 import User from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import UserResponseDto from './dto/get-user.dto';
 
 @Injectable()
 export class UserService {
@@ -15,39 +20,48 @@ export class UserService {
     const userExists = await this.userRepo.getUserByEmail(createUserDto.email);
 
     if (userExists) {
-      throw new Error('User already exists');
+      throw new BadRequestException('User already exists');
     }
 
     const hashedPassword = await argon2.hash(createUserDto.password);
     createUserDto.password = hashedPassword;
     const user = plainToClass(User, createUserDto);
 
-    const newUser = await this.userRepo.addUser(user);
+    const [newUser] = await this.userRepo.addUser(user);
 
-    return newUser;
+    return plainToClass(UserResponseDto, newUser);
   }
 
   async findAll() {
     const users = await this.userRepo.getUsers();
-    return users;
+    return users.map((user) => plainToClass(UserResponseDto, user));
   }
 
   async findOne(id: number) {
-    const data = await this.userRepo.getUserById(id.toString());
-    return data;
+    const [data] = await this.userRepo.getUserById(id.toString());
+    const response = plainToClass(UserResponseDto, data);
+
+    return response;
   }
 
   async findByEmail(email: string) {
     const data = await this.userRepo.getUserByEmail(email);
 
     if (!data) {
-      throw new Error('User not found');
+      throw new NotFoundException('User not found');
     }
 
     return data;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
+  async update(id: number, updateUserDto: UpdateUserDto) {
+    await this.findOne(id);
+    const { password } = updateUserDto;
+
+    if (password) {
+      updateUserDto.password = await argon2.hash(password);
+    }
+
     const user = plainToClass(User, updateUserDto);
     return this.userRepo.updateUser(id.toString(), user);
   }
