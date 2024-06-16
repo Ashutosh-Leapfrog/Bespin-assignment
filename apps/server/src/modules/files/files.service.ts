@@ -18,10 +18,10 @@ export class FilesService {
     });
   }
 
-  async uploadFile(userId: number, file: Express.Multer.File) {
+  async uploadFile(file: Express.Multer.File) {
     const bucket = this.config.get(ENV_CONSTANTS.MINIO.BUCKET) ?? '';
 
-    const filename = `${userId}-${uuid()}`;
+    const filename = `${Date.now()}-${uuid()}`;
     const options = {
       'Content-Type': file.mimetype,
     };
