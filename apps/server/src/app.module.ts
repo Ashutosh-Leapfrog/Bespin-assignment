@@ -8,6 +8,7 @@ import { BlogModule } from './modules/blog/blog.module';
 import { GremlinModule } from './modules/gremlin/gremlin.module';
 import { UserModule } from './modules/user/user.module';
 import { UserFriendsModule } from './modules/user-friends/user-friends.module';
+import { FilesModule } from './modules/files/files.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { UserFriendsModule } from './modules/user-friends/user-friends.module';
       envFilePath: '.env',
     }),
     UserFriendsModule,
+    FilesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
