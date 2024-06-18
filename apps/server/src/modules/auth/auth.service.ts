@@ -52,4 +52,14 @@ export class AuthService {
   async register(data: CreateUserDto) {
     return this.userService.create(data);
   }
+
+  async verifyUser(userId: number) {
+    const user = await this.userService.findOne(userId);
+
+    return {
+      id: user.id,
+      username: user.username,
+      imageUrl: user.imageUrl,
+    };
+  }
 }

@@ -25,7 +25,7 @@ export default class UserRepo extends BaseRepository {
     return this.execute<User>(traversal);
   }
 
-  async getUserById(id: string) {
+  async getUserById(id: number) {
     const traversal = this.gremlinService.getClient().V(id).hasLabel(USER);
     return this.execute<User>(traversal);
   }
@@ -41,17 +41,14 @@ export default class UserRepo extends BaseRepository {
     return user;
   }
 
-  async updateUser(id: string, user: User) {
-    const traversal = this.gremlinService
-      .getClient()
-      .V(id)
-      .hasLabel(USER)
-      .propertyMap();
+  async updateUser(id: number, user: User) {
+    const traversal = this.gremlinService.getClient().V(id).hasLabel(USER);
     this.gremlinService.assignProperties(traversal, user);
-    return this.execute<User>(traversal);
+
+    return this.execute(traversal);
   }
 
-  async deleteUser(id: string) {
+  async deleteUser(id: number) {
     const traversal = this.gremlinService.getClient().V(id).drop();
     return this.execute(traversal);
   }

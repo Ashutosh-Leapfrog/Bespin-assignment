@@ -32,13 +32,19 @@ export class UserService {
     return plainToClass(UserResponseDto, newUser);
   }
 
-  async findAll() {
+  async findAll(userId: number) {
     const users = await this.userRepo.getUsers();
-    return users.map((user) => plainToClass(UserResponseDto, user));
+    const filteredUsers = users.filter((user) => user.id !== userId);
+    return filteredUsers.map((user) => plainToClass(UserResponseDto, user));
   }
 
   async findOne(id: number) {
-    const [data] = await this.userRepo.getUserById(id.toString());
+    const [data] = await this.userRepo.getUserById(id);
+
+    if (!data) {
+      throw new NotFoundException('User not found');
+    }
+
     const response = plainToClass(UserResponseDto, data);
 
     return response;
@@ -55,18 +61,20 @@ export class UserService {
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {
-    await this.findOne(id);
+    const [existingUser] = await this.userRepo.getUserById(id);
     const { password } = updateUserDto;
 
     if (password) {
       updateUserDto.password = await argon2.hash(password);
     }
 
+    updateUserDto.password = existingUser.password;
+
     const user = plainToClass(User, updateUserDto);
-    return this.userRepo.updateUser(id.toString(), user);
+    return this.userRepo.updateUser(id, user);
   }
 
   remove(id: number) {
-    return this.userRepo.deleteUser(id.toString());
+    return this.userRepo.deleteUser(id);
   }
 }

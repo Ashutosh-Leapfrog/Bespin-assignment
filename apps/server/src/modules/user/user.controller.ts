@@ -6,11 +6,14 @@ import {
   Param,
   Put,
   UseGuards,
+  Request,
 } from '@nestjs/common';
 
 import JwtGuard from '../auth/auth.jwt.guard';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserService } from './user.service';
+import CustomRequest from '@/interfaces/custom.request';
+import UserResponseDto from './dto/get-user.dto';
 
 @Controller('user')
 export class UserController {
@@ -18,13 +21,15 @@ export class UserController {
 
   @UseGuards(JwtGuard)
   @Get()
-  findAll() {
-    return this.userService.findAll();
+  findAll(@Request() req: CustomRequest) {
+    const { userId } = req.user;
+    return this.userService.findAll(userId);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.userService.findOne(+id);
+  async findOne(@Param('id') id: string) {
+    const user: UserResponseDto = await this.userService.findOne(+id);
+    return user;
   }
 
   @UseGuards(JwtGuard)

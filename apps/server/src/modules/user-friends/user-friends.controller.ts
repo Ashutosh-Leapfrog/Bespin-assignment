@@ -30,6 +30,17 @@ export class UserFriendsController {
   }
 
   @UseGuards(JwtGuard)
+  @Post('/cancel')
+  cancelRequest(
+    @Body() createUserFriendDto: UserFriend,
+    @Request() req: CustomRequest,
+  ) {
+    const { userId } = req.user;
+    createUserFriendDto.userId = userId;
+    return this.userFriendsService.cancelRequest(createUserFriendDto);
+  }
+
+  @UseGuards(JwtGuard)
   @Post('/request')
   sendRequest(
     @Body() createUserFriendDto: UserFriend,
@@ -48,10 +59,24 @@ export class UserFriendsController {
   }
 
   @UseGuards(JwtGuard)
+  @Get('/request/sent')
+  findSentRequests(@Request() req: CustomRequest) {
+    const { userId } = req.user;
+    return this.userFriendsService.findSentRequests(userId);
+  }
+
+  @UseGuards(JwtGuard)
   @Get('/request')
   findAllRequests(@Request() req: CustomRequest) {
     const { userId } = req.user;
     return this.userFriendsService.findRequests(userId);
+  }
+
+  @UseGuards(JwtGuard)
+  @Get('/suggestions')
+  findAllSuggestions(@Request() req: CustomRequest) {
+    const { userId } = req.user;
+    return this.userFriendsService.getFriendsSuggestions(userId);
   }
 
   @UseGuards(JwtGuard)

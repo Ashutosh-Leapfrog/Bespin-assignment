@@ -6,10 +6,11 @@ import { GremlinService } from '../gremlin/gremlin.service';
 import { UserFriend } from './entities/user-friend.entity';
 import { process } from 'gremlin';
 
-const { statics } = process;
-
 const { USER } = labels;
 const { FRIENDS_WITH, FRIEND_REQUESTED } = relations;
+
+const { statics } = process;
+
 @Injectable()
 export default class UserFriendsRepo extends BaseRepository {
   constructor(readonly gremlinService: GremlinService) {
@@ -27,10 +28,34 @@ export default class UserFriendsRepo extends BaseRepository {
       .addE(type)
       .from_('user')
       .to('friend');
+
     return traversal;
   }
 
+  async getRelations(userFriend: UserFriend, label: string) {
+    const { userId, friendId } = userFriend;
+
+    const traversal = this.gremlinService
+      .getClient()
+      .V(userId)
+      .outE(label)
+      .as(label)
+      .inV()
+      .hasId(friendId)
+      .as('vertex')
+      .select('vertex', label);
+
+    const [friendRelation]: any = await this.execute(traversal);
+
+    if (!friendRelation) {
+      return null;
+    }
+
+    return friendRelation.friendRequested.id.relationId;
+  }
+
   async acceptRequest(userFriend: UserFriend) {
+    await this.deleteRelation(userFriend, FRIEND_REQUESTED);
     const traversal = await this.createRelations(userFriend, FRIENDS_WITH);
     return this.execute(traversal);
   }
@@ -41,9 +66,32 @@ export default class UserFriendsRepo extends BaseRepository {
     return this.execute(traversal);
   }
 
-  // async declineRequest(userFriend: UserFriend) {}
+  async cancelRequest(userFriend: UserFriend) {
+    await this.deleteRelation(userFriend, FRIEND_REQUESTED);
+  }
+
+  async deleteRelation(userFriend: UserFriend, label: string) {
+    const friendRequestedId = await this.getRelations(userFriend, label);
+
+    await this.gremlinService
+      .getClient()
+      .E(friendRequestedId)
+      .hasLabel(label)
+      .drop()
+      .iterate();
+  }
 
   async getRequests(userId: number) {
+    const traversal = this.gremlinService
+      .getClient()
+      .V(userId)
+      .inE(FRIEND_REQUESTED)
+      .inV();
+
+    return this.execute(traversal);
+  }
+
+  async getSentRequests(userId: number) {
     const traversal = this.gremlinService
       .getClient()
       .V(userId)
@@ -51,6 +99,34 @@ export default class UserFriendsRepo extends BaseRepository {
       .inV();
 
     return this.execute(traversal);
+  }
+
+  async getFriendsSuggestions(userId: number) {
+    const generalSuggestionsTraversal = this.gremlinService
+      .getClient()
+      .V()
+      .hasLabel(USER)
+      .not(statics.bothE().hasLabel(FRIENDS_WITH).otherV())
+      .not(statics.bothE().hasLabel(FRIEND_REQUESTED).otherV())
+      .not(statics.hasId(userId))
+      .limit(5);
+
+    const allSuggestions = await this.execute(generalSuggestionsTraversal);
+
+    const commonSuggestionsTraversal = this.gremlinService
+      .getClient()
+      .V()
+      .hasLabel(USER)
+      .both(FRIENDS_WITH)
+      .both(FRIENDS_WITH)
+      .not(statics.bothE().hasLabel(FRIENDS_WITH).otherV())
+      .not(statics.bothE().hasLabel(FRIEND_REQUESTED).otherV())
+      .not(statics.hasId(userId))
+      .limit(5);
+
+    const commonSuggestions = await this.execute(commonSuggestionsTraversal);
+
+    return [...commonSuggestions, ...allSuggestions];
   }
 
   async getFriends(userId: number) {
@@ -64,19 +140,6 @@ export default class UserFriendsRepo extends BaseRepository {
   }
 
   async deleteFriend(userFriend: UserFriend) {
-    const { userId, friendId } = userFriend;
-
-    const [edge] = await this.gremlinService
-      .getClient()
-      .V(userId)
-      .bothE(FRIENDS_WITH)
-      .where(statics.otherV().hasId(friendId))
-      .toList();
-
-    const edgeId = (edge as any).id.relationId;
-
-    const traversal = this.gremlinService.getClient().E(edgeId).drop();
-
-    return this.execute(traversal);
+    await this.deleteRelation(userFriend, FRIENDS_WITH);
   }
 }
