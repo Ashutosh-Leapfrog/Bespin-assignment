@@ -7,7 +7,7 @@ interface AddFriendCardProps {
 const AddFriendFooter = (props: AddFriendCardProps) => {
   const { onAccept, onDecline, cancelText } = props;
   return (
-    <div className="flex mt-4 md:mt-6">
+    <div className="flex mt-4 gap-3 md:mt-6">
       {onAccept && (
         <button
           onClick={onAccept}

@@ -64,11 +64,13 @@ const BlogsPage = (props: BlogsPageProps) => {
       {blogData?.map((blog) => <BlogCard key={blog.id} blog={blog} />)}
 
       <CreateBlogForm />
-      <div className="absolute bottom-10 right-20">
-        <Fab color="primary" aria-label="add">
-          <IoMdAdd />
-        </Fab>
-      </div>
+      {isUsersBlog && (
+        <div className="absolute bottom-10 right-20">
+          <Fab color="primary" aria-label="add">
+            <IoMdAdd />
+          </Fab>
+        </div>
+      )}
     </div>
   );
 };
