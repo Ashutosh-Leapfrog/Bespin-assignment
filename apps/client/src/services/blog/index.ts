@@ -3,7 +3,7 @@ import http from "../http";
 
 const BLOGS = "/blog";
 
-export const getBlogs = async () => {
+export const getBlogs = async (): Promise<IBlog[]> => {
   const { data } = await http.get(BLOGS);
   return data;
 };

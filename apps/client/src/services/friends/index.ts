@@ -34,7 +34,7 @@ export const getFriendRequests = async (): Promise<IUser[]> => {
 };
 
 export const removeFriend = async (id: number) => {
-  const { data } = await http.delete(`/friends/${id}`);
+  const { data } = await http.delete(`/friends/remove/${id}`);
   return data;
 };
 

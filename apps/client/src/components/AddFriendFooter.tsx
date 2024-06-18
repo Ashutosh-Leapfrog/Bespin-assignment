@@ -1,11 +1,11 @@
 interface AddFriendCardProps {
   onAccept?: (e: React.MouseEvent) => void;
   onDecline?: (e: React.MouseEvent) => void;
-  cancel?: boolean;
+  cancelText: string;
 }
 
 const AddFriendFooter = (props: AddFriendCardProps) => {
-  const { onAccept, onDecline, cancel } = props;
+  const { onAccept, onDecline, cancelText } = props;
   return (
     <div className="flex mt-4 md:mt-6">
       {onAccept && (
@@ -22,7 +22,7 @@ const AddFriendFooter = (props: AddFriendCardProps) => {
           onClick={onDecline}
           className="inline-flex items-center px-4 py-2 text-sm font-medium text-center text-white bg-error-700 rounded-lg hover:bg-error-800"
         >
-          {cancel ? "Cancel" : "Decline"}
+          {cancelText}
         </button>
       )}
     </div>

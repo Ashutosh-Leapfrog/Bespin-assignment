@@ -4,7 +4,7 @@ import BlogsPage from "~/pages/Blogs";
 const blogRoutes: RouteObject[] = [
   {
     index: true,
-    element: <BlogsPage />,
+    element: <BlogsPage isUsersBlog />,
   },
 ];
 

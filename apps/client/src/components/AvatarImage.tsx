@@ -9,7 +9,7 @@ const AvatarImage = (props: CustomImageProps) => {
   return (
     <div className={className}>
       <img
-        className="w-full h-full object-cover rounded-full"
+        className="w-full h-full object-cover rounded-full shadow shadow-lg"
         src={src}
         alt={alt}
         onError={(e) => {

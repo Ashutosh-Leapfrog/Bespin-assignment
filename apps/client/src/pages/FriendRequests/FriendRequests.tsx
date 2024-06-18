@@ -27,7 +27,11 @@ const FriendRequests = (props: FriendRequestsProps) => {
   const { mutateAsync: acceptRequestsMutate } = useMutation({
     mutationFn: acceptRequests,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["receivedFriendRequests"] });
+      queryClient.invalidateQueries({
+        queryKey: ["receivedFriendRequests"],
+      });
+      queryClient.invalidateQueries({ queryKey: ["sentFriendRequests"] });
+      queryClient.invalidateQueries({ queryKey: ["suggestions"] });
     },
   });
 
@@ -104,10 +108,11 @@ const FriendRequests = (props: FriendRequestsProps) => {
                 e.stopPropagation();
                 handleDecline(friend.id);
               }}
+              cancelText="Decline"
             />
           ) : (
             <AddFriendFooter
-              cancel
+              cancelText="Cancel"
               onDecline={(e: React.MouseEvent) => {
                 e.stopPropagation();
                 handleDecline(friend.id);

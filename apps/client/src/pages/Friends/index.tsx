@@ -1,14 +1,29 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
+import AddFriendFooter from "~/components/AddFriendFooter";
 import FriendCard from "~/components/FriendCard";
-import { getFriends } from "~/services/friends";
+import { getFriends, removeFriend } from "~/services/friends";
 
 const FriendsPage = () => {
   const navigate = useNavigate();
-  const { data, isPending, isError, isSuccess } = useQuery({
+
+  const queryClient = useQueryClient();
+
+  const { data, isPending, isError } = useQuery({
     queryKey: ["friends"],
     queryFn: getFriends,
   });
+
+  const { mutateAsync: removeFriendMutate } = useMutation({
+    mutationFn: removeFriend,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["friends"] });
+    },
+  });
+
+  const handleUnfriend = async (id: number) => {
+    await removeFriendMutate(id);
+  };
 
   if (isPending) {
     return <div>Loading...</div>;
@@ -18,7 +33,7 @@ const FriendsPage = () => {
     return <div>Error</div>;
   }
 
-  if (!isSuccess) {
+  if (!data) {
     return <div>No data</div>;
   }
 
@@ -33,7 +48,15 @@ const FriendsPage = () => {
               name={friend.username}
               imageUrl={friend.imageUrl}
               bio={friend.bio}
-            />
+            >
+              <AddFriendFooter
+                onDecline={(e: React.MouseEvent) => {
+                  e.stopPropagation();
+                  handleUnfriend(friend.id);
+                }}
+                cancelText="Unfriend"
+              />
+            </FriendCard>
           );
         })}
       </div>
