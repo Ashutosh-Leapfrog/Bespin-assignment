@@ -43,7 +43,16 @@ export class UserFriendsService {
     return this.userFriendRepo.getFriends(userId);
   }
 
-  removeFriend(userFriend: UserFriend) {
-    return this.userFriendRepo.deleteFriend(userFriend);
+  async removeFriend(userFriend: UserFriend) {
+    const requestId = await this.userFriendRepo.getRelations(
+      userFriend,
+      relations.FRIENDS_WITH,
+    );
+
+    if (!requestId) {
+      throw new BadRequestException('Friend does not exist');
+    }
+
+    return await this.userFriendRepo.deleteFriend(userFriend);
   }
 }

@@ -1,10 +1,10 @@
 import labels from '@/constants/labels';
 import relations from '@/constants/relations';
 import { Injectable } from '@nestjs/common';
+import { process } from 'gremlin';
 import { BaseRepository } from '../gremlin/base.repository';
 import { GremlinService } from '../gremlin/gremlin.service';
 import { UserFriend } from './entities/user-friend.entity';
-import { process } from 'gremlin';
 
 const { USER } = labels;
 const { FRIENDS_WITH, FRIEND_REQUESTED } = relations;
@@ -32,6 +32,28 @@ export default class UserFriendsRepo extends BaseRepository {
     return traversal;
   }
 
+  private async getIncomingRelations(userFriend: UserFriend) {
+    const { userId, friendId } = userFriend;
+
+    const traversal = this.gremlinService
+      .getClient()
+      .V(userId)
+      .inE(FRIEND_REQUESTED)
+      .as(FRIEND_REQUESTED)
+      .outV()
+      .hasId(friendId)
+      .as('vertex')
+      .select('vertex', FRIEND_REQUESTED);
+
+    const [friendRelation]: any = await this.execute(traversal);
+
+    if (!friendRelation) {
+      return null;
+    }
+
+    return friendRelation.friendRequested.id.relationId;
+  }
+
   async getRelations(userFriend: UserFriend, label: string) {
     const { userId, friendId } = userFriend;
 
@@ -49,6 +71,10 @@ export default class UserFriendsRepo extends BaseRepository {
 
     if (!friendRelation) {
       return null;
+    }
+
+    if (label === FRIENDS_WITH) {
+      return friendRelation.isFriendsWith.id.relationId;
     }
 
     return friendRelation.friendRequested.id.relationId;
@@ -71,7 +97,12 @@ export default class UserFriendsRepo extends BaseRepository {
   }
 
   async deleteRelation(userFriend: UserFriend, label: string) {
-    const friendRequestedId = await this.getRelations(userFriend, label);
+    let friendRequestedId;
+    if (label === FRIEND_REQUESTED) {
+      friendRequestedId = await this.getIncomingRelations(userFriend);
+    } else {
+      friendRequestedId = await this.getRelations(userFriend, label);
+    }
 
     await this.gremlinService
       .getClient()
@@ -86,7 +117,7 @@ export default class UserFriendsRepo extends BaseRepository {
       .getClient()
       .V(userId)
       .inE(FRIEND_REQUESTED)
-      .inV();
+      .outV();
 
     return this.execute(traversal);
   }
