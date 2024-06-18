@@ -1,5 +1,9 @@
 import { RouteObject } from "react-router-dom";
 import routes from "~/constants/routes";
+import FriendRequestPage from "~/pages/FriendRequests";
+import FriendsPage from "~/pages/Friends";
+import ProfilePage from "~/pages/Profile";
+import ProfileEditForm from "~/pages/Profile/edit";
 
 const userRoutes: RouteObject[] = [
   {
@@ -8,7 +12,19 @@ const userRoutes: RouteObject[] = [
   },
   {
     path: routes.FRIENDS,
-    element: <div>friends</div>,
+    element: <FriendsPage />,
+  },
+  {
+    path: routes.REQUESTS,
+    element: <FriendRequestPage />,
+  },
+  {
+    path: "profile/:userId",
+    element: <ProfilePage />,
+  },
+  {
+    path: "profile/:userId/edit",
+    element: <ProfileEditForm />,
   },
 ];
 

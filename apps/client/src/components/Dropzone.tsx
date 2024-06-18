@@ -3,11 +3,12 @@ import React, { ChangeEvent, useState } from "react";
 interface DropzoneProps {
   onChange: (event: ChangeEvent<HTMLInputElement>) => void;
   name: string;
+  value?: string;
 }
 
 const Dropzone: React.FC<DropzoneProps> = (props) => {
-  const { onChange, name } = props;
-  const [imagePreview, setImagePreview] = useState<string>("");
+  const { onChange, name, value } = props;
+  const [imagePreview, setImagePreview] = useState<string>(value || "");
 
   const handleImagePreview = (files: FileList | null) => {
     if (files && files[0]) {

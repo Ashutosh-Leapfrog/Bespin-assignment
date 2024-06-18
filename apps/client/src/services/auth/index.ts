@@ -15,3 +15,8 @@ export const register = async (data: ICreateUser) => {
   });
   return response.data;
 };
+
+export const verifyUser = async () => {
+  const response = await http.get("/auth/me");
+  return response.data;
+};

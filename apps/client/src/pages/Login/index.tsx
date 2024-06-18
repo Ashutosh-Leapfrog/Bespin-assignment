@@ -56,7 +56,7 @@ const LoginPage = () => {
     <Container maxWidth="sm" sx={{ textAlign: "center", paddingTop: 10 }}>
       <h1 className="text-3xl font-bold text-primary-900 mb-4">Login</h1>
       <form onSubmit={formik.handleSubmit}>
-        <Box display={"flex"} flexDirection={"column"} gap={2}>
+        <Box display="flex" flexDirection={"column"} gap={2}>
           <TextField
             label="Email"
             name="username"

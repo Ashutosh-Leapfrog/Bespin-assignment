@@ -5,6 +5,10 @@ export interface IBlog {
   content: string;
   thumbnail?: string;
   authorId: number;
+  author: {
+    username: string;
+    imageUrl: string;
+  };
 }
 
 export interface ICreateBlog {

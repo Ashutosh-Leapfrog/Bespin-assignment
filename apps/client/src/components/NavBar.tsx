@@ -16,6 +16,7 @@ import { IoPersonCircle } from "react-icons/io5";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import routes from "~/constants/routes";
+import ProfileService from "~/services/ProfileService";
 import TokenService from "~/services/TokenService";
 
 const NavBarItems = [
@@ -51,13 +52,15 @@ const NavBar = () => {
 
   const handleLogout = () => {
     TokenService.removeTokens();
+    ProfileService.removeProfile();
     handleClose();
     navigate(`/${routes.LOGIN}`, { replace: true });
   };
 
-  const handleProfileClick = () => {
+  const handleProfileClick = async () => {
+    const userId = await ProfileService.getUserId();
     handleClose();
-    navigate(`/${routes.PROFILE}`, { replace: true });
+    navigate(`/${routes.USERS}/${routes.PROFILE}/${userId}`, { replace: true });
   };
 
   return (

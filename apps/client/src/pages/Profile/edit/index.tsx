@@ -1,7 +1,7 @@
 import CreateUserForm from "~/components/CreateUserForm";
 
-const RegisterPage = () => {
+const ProfileEditForm = () => {
   return <CreateUserForm />;
 };
 
-export default RegisterPage;
+export default ProfileEditForm;

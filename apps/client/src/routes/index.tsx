@@ -8,6 +8,7 @@ import userRoutes from "./userRoutes";
 import ProtectedRoutes from "./ProtectedRoutes";
 import UnprotectedRoutes from "./UnprotectedRoutes";
 import routes from "~/constants/routes";
+import blogRoutes from "./blogRoutes";
 
 const router = createBrowserRouter([
   {
@@ -37,6 +38,10 @@ const router = createBrowserRouter([
       {
         path: routes.USERS,
         children: userRoutes,
+      },
+      {
+        path: routes.BLOGS,
+        children: blogRoutes,
       },
     ],
   },

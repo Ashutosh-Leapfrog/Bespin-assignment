@@ -6,4 +6,5 @@ export default {
   BLOGS: "blogs",
   FRIENDS: "friends",
   PROFILE: "profile",
+  REQUESTS : "requests"
 };

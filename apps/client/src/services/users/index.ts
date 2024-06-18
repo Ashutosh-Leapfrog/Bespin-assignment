@@ -1,13 +1,13 @@
-import ICreateUser from "~/interfaces/IUser";
+import { ICreateUser, IUser } from "~/interfaces/IUser";
 import http from "../http";
 
 const USER = "/user";
-export const getUsers = async () => {
+export const getUsers = async (): Promise<IUser[]> => {
   const { data } = await http.get(USER);
   return data;
 };
 
-export const getUser = async (id: number) => {
+export const getUser = async (id: number): Promise<IUser> => {
   const { data } = await http.get(`${USER}/${id}`);
   return data;
 };

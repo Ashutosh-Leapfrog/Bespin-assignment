@@ -1,24 +1,35 @@
-import { Box, Container } from "@mui/material";
+import { Container } from "@mui/material";
+import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
+
 import NavBar from "~/components/NavBar";
+import { verifyUser } from "~/services/auth";
+import ProfileService from "~/services/ProfileService";
 import TokenService from "~/services/TokenService";
 
 const ProtectedRoutes = () => {
   const navigate = useNavigate();
 
+  const { data } = useQuery({
+    queryKey: ["profile"],
+    queryFn: verifyUser,
+  });
+
+  ProfileService.setProfile(data);
+
   useEffect(() => {
     if (!TokenService.getAccessToken()) {
       navigate("/login", { replace: true });
     }
-  }, [navigate]);
+  }, [data]);
 
   return (
-    <Container maxWidth="xl">
+    <Container maxWidth="xl" className="w-full h-screen">
       <NavBar />
-      <Box sx={{ marginTop: 2, paddingLeft: 3 }}>
+      <div className="w-full h-screen p-9">
         <Outlet />
-      </Box>
+      </div>
     </Container>
   );
 };
