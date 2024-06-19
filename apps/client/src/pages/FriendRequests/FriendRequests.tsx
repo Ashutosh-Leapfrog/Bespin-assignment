@@ -8,9 +8,10 @@ import Loading from "~/components/Loading";
 import NoData from "~/components/NoData";
 import {
   acceptRequests,
-  declineRequests,
+  rejectRequests,
   getFriendRequests,
   getSentFriendRequests,
+  declineRequests,
 } from "~/services/friends";
 
 interface FriendRequestsProps {
@@ -26,6 +27,17 @@ const FriendRequests = (props: FriendRequestsProps) => {
 
   const { mutateAsync: acceptRequestsMutate } = useMutation({
     mutationFn: acceptRequests,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["receivedFriendRequests"],
+      });
+      queryClient.invalidateQueries({ queryKey: ["sentFriendRequests"] });
+      queryClient.invalidateQueries({ queryKey: ["suggestions"] });
+    },
+  });
+
+  const { mutateAsync: rejectRequestsMutate } = useMutation({
+    mutationFn: rejectRequests,
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["receivedFriendRequests"],
@@ -71,6 +83,10 @@ const FriendRequests = (props: FriendRequestsProps) => {
   };
 
   const handleDecline = async (id: number) => {
+    await rejectRequestsMutate(id);
+  };
+
+  const handleCancel = async (id: number) => {
     await cancelRequestsMutate(id);
   };
 
@@ -115,7 +131,7 @@ const FriendRequests = (props: FriendRequestsProps) => {
               cancelText="Cancel"
               onDecline={(e: React.MouseEvent) => {
                 e.stopPropagation();
-                handleDecline(friend.id);
+                handleCancel(friend.id);
               }}
             />
           )}

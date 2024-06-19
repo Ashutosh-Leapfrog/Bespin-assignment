@@ -22,6 +22,12 @@ export const acceptRequests = async (id: number) => {
   return data;
 };
 
+export const rejectRequests = async (id: number) => {
+  await http.post(`/friends/reject`, {
+    friendId: id,
+  });
+};
+
 export const declineRequests = async (id: number) => {
   await http.post(`/friends/cancel`, {
     friendId: id,

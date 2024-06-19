@@ -30,6 +30,17 @@ export class UserFriendsController {
   }
 
   @UseGuards(JwtGuard)
+  @Post('/reject')
+  rejectRequest(
+    @Body() createUserFriendDto: UserFriend,
+    @Request() req: CustomRequest,
+  ) {
+    const { userId } = req.user;
+    createUserFriendDto.userId = userId;
+    return this.userFriendsService.cancelRequest(createUserFriendDto);
+  }
+
+  @UseGuards(JwtGuard)
   @Post('/cancel')
   cancelRequest(
     @Body() createUserFriendDto: UserFriend,
@@ -37,7 +48,7 @@ export class UserFriendsController {
   ) {
     const { userId } = req.user;
     createUserFriendDto.userId = userId;
-    return this.userFriendsService.cancelRequest(createUserFriendDto);
+    return this.userFriendsService.cancelRequest(createUserFriendDto, 'cancel');
   }
 
   @UseGuards(JwtGuard)

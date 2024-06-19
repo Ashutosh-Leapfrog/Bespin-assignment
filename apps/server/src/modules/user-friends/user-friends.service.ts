@@ -23,8 +23,8 @@ export class UserFriendsService {
     return this.userFriendRepo.acceptRequest(createUserFriend);
   }
 
-  cancelRequest(createUserFriend: UserFriend) {
-    return this.userFriendRepo.cancelRequest(createUserFriend);
+  cancelRequest(createUserFriend: UserFriend, type?: string) {
+    return this.userFriendRepo.cancelRequest(createUserFriend, type);
   }
 
   findRequests(userId: number) {

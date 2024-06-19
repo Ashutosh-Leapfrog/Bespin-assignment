@@ -92,16 +92,16 @@ export default class UserFriendsRepo extends BaseRepository {
     return this.execute(traversal);
   }
 
-  async cancelRequest(userFriend: UserFriend) {
-    await this.deleteRelation(userFriend, FRIEND_REQUESTED);
+  async cancelRequest(userFriend: UserFriend, type?: string) {
+    await this.deleteRelation(userFriend, FRIEND_REQUESTED, type);
   }
 
-  async deleteRelation(userFriend: UserFriend, label: string) {
+  async deleteRelation(userFriend: UserFriend, label: string, type?: string) {
     let friendRequestedId;
-    if (label === FRIEND_REQUESTED) {
-      friendRequestedId = await this.getIncomingRelations(userFriend);
-    } else {
+    if (label === FRIENDS_WITH || type === 'cancel') {
       friendRequestedId = await this.getRelations(userFriend, label);
+    } else {
+      friendRequestedId = await this.getIncomingRelations(userFriend);
     }
 
     await this.gremlinService
@@ -139,8 +139,7 @@ export default class UserFriendsRepo extends BaseRepository {
       .hasLabel(USER)
       .not(statics.bothE().hasLabel(FRIENDS_WITH).otherV())
       .not(statics.bothE().hasLabel(FRIEND_REQUESTED).otherV())
-      .not(statics.hasId(userId))
-      .limit(5);
+      .not(statics.hasId(userId));
 
     const allSuggestions = await this.execute(generalSuggestionsTraversal);
 
@@ -152,8 +151,7 @@ export default class UserFriendsRepo extends BaseRepository {
       .both(FRIENDS_WITH)
       .not(statics.bothE().hasLabel(FRIENDS_WITH).otherV())
       .not(statics.bothE().hasLabel(FRIEND_REQUESTED).otherV())
-      .not(statics.hasId(userId))
-      .limit(5);
+      .not(statics.hasId(userId));
 
     const commonSuggestions = await this.execute(commonSuggestionsTraversal);
 

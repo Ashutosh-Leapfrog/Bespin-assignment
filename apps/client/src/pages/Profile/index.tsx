@@ -48,7 +48,7 @@ const ProfilePage = () => {
   }
 
   return (
-    <div className="w-full h-full flex flex-col items-start">
+    <div className="w-full h-full flex flex-col bg-gray-100">
       <div className="mb-10 flex justify-end items-center w-full">
         {isCurrentUser && (
           <IconButton
@@ -68,7 +68,7 @@ const ProfilePage = () => {
           </IconButton>
         )}
       </div>
-      <div className="flex flex-col w-full gap-5">
+      <div className="flex flex-col max-w-3xl w-full gap-5">
         <div className="flex justify-center items-center">
           <AvatarImage
             className="w-32 h-32"
@@ -77,8 +77,8 @@ const ProfilePage = () => {
           />
         </div>
         <h1 className="text-3xl font-bold">{data?.username}</h1>
-        <div className="flex gap-2 items-center">
-          <ImProfile />
+        <div className="flex gap-2 items-start">
+          <ImProfile size={32} />
           {data?.bio}
         </div>
         <div className="flex gap-2 items-center">
